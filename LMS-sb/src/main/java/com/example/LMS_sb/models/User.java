@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Table(name = "users")
@@ -35,5 +34,11 @@ public class User {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+
+    @PrePersist
+    public void onCreate(){
+        this.createdAt = LocalDateTime.now();
+    }
 
 }
