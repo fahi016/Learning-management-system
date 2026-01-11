@@ -4,6 +4,7 @@ package com.example.LMS_sb.controllers;
 import com.example.LMS_sb.dtos.AdminDto;
 import com.example.LMS_sb.dtos.CreateStudentRequestDto;
 import com.example.LMS_sb.dtos.CreateTeacherRequestDto;
+import com.example.LMS_sb.dtos.LoginStudentDto;
 import com.example.LMS_sb.services.AdminService;
 import com.example.LMS_sb.services.StudentService;
 import com.example.LMS_sb.services.TeacherService;
@@ -43,6 +44,12 @@ public class AuthController {
     public ResponseEntity<?> registerTeacher(@RequestBody CreateTeacherRequestDto dto){
         teacherService.createTeacher(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    }
+    @PostMapping("/api/auth/student/login")
+    public ResponseEntity<?> loginStudent(@RequestBody LoginStudentDto dto){
+
+        return ResponseEntity.ok(studentService.authenticateStudent(dto));
 
     }
 }
