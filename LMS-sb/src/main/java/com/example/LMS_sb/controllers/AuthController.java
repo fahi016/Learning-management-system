@@ -3,8 +3,10 @@ package com.example.LMS_sb.controllers;
 
 import com.example.LMS_sb.dtos.AdminDto;
 import com.example.LMS_sb.dtos.CreateStudentRequestDto;
+import com.example.LMS_sb.dtos.CreateTeacherRequestDto;
 import com.example.LMS_sb.services.AdminService;
 import com.example.LMS_sb.services.StudentService;
+import com.example.LMS_sb.services.TeacherService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ public class AuthController {
 
     private StudentService studentService;
     private AdminService adminService;
+    private TeacherService teacherService;
 
     @PostMapping("/api/auth/admin")
     public ResponseEntity<?> loginAdmin(@RequestBody AdminDto dto){
@@ -33,6 +36,13 @@ public class AuthController {
     public ResponseEntity<?> registerStudent(@RequestBody CreateStudentRequestDto dto){
               studentService.createStudent(dto);
               return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    }
+    @PostMapping("/api/admin/users/teacher")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> registerTeacher(@RequestBody CreateTeacherRequestDto dto){
+        teacherService.createTeacher(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
 }
