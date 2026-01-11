@@ -1,10 +1,7 @@
 package com.example.LMS_sb.controllers;
 
 
-import com.example.LMS_sb.dtos.AdminDto;
-import com.example.LMS_sb.dtos.CreateStudentRequestDto;
-import com.example.LMS_sb.dtos.CreateTeacherRequestDto;
-import com.example.LMS_sb.dtos.LoginStudentDto;
+import com.example.LMS_sb.dtos.*;
 import com.example.LMS_sb.services.AdminService;
 import com.example.LMS_sb.services.StudentService;
 import com.example.LMS_sb.services.TeacherService;
@@ -14,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -50,6 +46,12 @@ public class AuthController {
     public ResponseEntity<?> loginStudent(@RequestBody LoginStudentDto dto){
 
         return ResponseEntity.ok(studentService.authenticateStudent(dto));
+
+    }
+    @PostMapping("/api/auth/teacher/login")
+    public ResponseEntity<?> loginStudent(@RequestBody LoginTeacherDto dto){
+
+        return ResponseEntity.ok(teacherService.authenticateTeacher(dto));
 
     }
 }
