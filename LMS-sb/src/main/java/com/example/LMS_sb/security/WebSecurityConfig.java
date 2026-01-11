@@ -46,7 +46,7 @@ public class WebSecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session->
                          session.sessionCreationPolicy(
-                                 org.springframework.security.config.http.SessionCreationPolicy.STATELESS
+                                 SessionCreationPolicy.STATELESS
                          )
                         )
                 .authorizeHttpRequests(auth -> auth
