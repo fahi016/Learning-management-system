@@ -3,7 +3,7 @@ package com.example.LMS_sb.dtos;
 import lombok.Data;
 
 @Data
-public class AdminDto {
+public class UserDto {
     private String email;
     private String password;
 

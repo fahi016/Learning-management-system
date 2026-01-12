@@ -2,9 +2,9 @@ package com.example.LMS_sb.controllers;
 
 
 import com.example.LMS_sb.dtos.*;
-import com.example.LMS_sb.services.AdminService;
 import com.example.LMS_sb.services.StudentService;
 import com.example.LMS_sb.services.TeacherService;
+import com.example.LMS_sb.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,40 +18,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private StudentService studentService;
-    private AdminService adminService;
     private TeacherService teacherService;
+    private UserService userService;
 
-    @PostMapping("/api/auth/admin")
-    public ResponseEntity<?> loginAdmin(@RequestBody AdminDto dto){
 
-        return ResponseEntity.ok(adminService.authenticateAdmin(dto));
-
-    }
-
-    @PostMapping("/api/admin/users/student")
+    @PostMapping("/api/auth/register/student")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> registerStudent(@RequestBody CreateStudentRequestDto dto){
               studentService.createStudent(dto);
               return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
-    @PostMapping("/api/admin/users/teacher")
+    @PostMapping("/api/auth/register/teacher")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> registerTeacher(@RequestBody CreateTeacherRequestDto dto){
         teacherService.createTeacher(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
-    @PostMapping("/api/auth/student/login")
-    public ResponseEntity<?> loginStudent(@RequestBody LoginStudentDto dto){
+    @PostMapping("/api/auth/login")
+    public ResponseEntity<?> loginUser(@RequestBody UserDto dto){
 
-        return ResponseEntity.ok(studentService.authenticateStudent(dto));
-
-    }
-    @PostMapping("/api/auth/teacher/login")
-    public ResponseEntity<?> loginStudent(@RequestBody LoginTeacherDto dto){
-
-        return ResponseEntity.ok(teacherService.authenticateTeacher(dto));
+        return ResponseEntity.ok(userService.authenticateUser(dto));
 
     }
+
 }
