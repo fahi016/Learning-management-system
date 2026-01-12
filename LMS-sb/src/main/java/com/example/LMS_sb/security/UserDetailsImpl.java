@@ -21,22 +21,26 @@ public class UserDetailsImpl implements UserDetails {
     private Long id;
     private String email;
     private String password;
+    private String role;
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserDetailsImpl(Long id, String email, String password, String role,Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
+        this.role = role;
     }
 
     public static UserDetailsImpl build(User user){
+        String roleName = user.getRole().name();
         GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_"+user.getRole().name());
         return new UserDetailsImpl(
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
+                roleName,
                 Collections.singletonList(authority)
         );
     }

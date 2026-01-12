@@ -1,6 +1,7 @@
 package com.example.LMS_sb.services;
 
 import com.example.LMS_sb.dtos.CreateStudentRequestDto;
+import com.example.LMS_sb.dtos.StudentMeDto;
 import com.example.LMS_sb.models.Student;
 import com.example.LMS_sb.models.User;
 import com.example.LMS_sb.models.enums.Role;
@@ -36,4 +37,18 @@ public class StudentService {
 
     }
 
+    public Student getStudentByUserEmail(String email){
+        return studentRepository.findByUserEmail(email).orElseThrow(()->new RuntimeException("Student not found with email: "+email));
+
+    }
+
+    public StudentMeDto convertToDto(Student student) {
+        StudentMeDto dto = new StudentMeDto();
+        dto.setName(student.getUser().getName());
+        dto.setEmail(student.getUser().getEmail());
+        dto.setRole(student.getUser().getRole());
+        dto.setRollNumber(student.getRollNumber());
+        dto.setDepartment(student.getDepartment());
+        return dto;
+    }
 }

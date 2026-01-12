@@ -1,6 +1,7 @@
 package com.example.LMS_sb.services;
 
 import com.example.LMS_sb.dtos.CreateTeacherRequestDto;
+import com.example.LMS_sb.dtos.TeacherMeDto;
 import com.example.LMS_sb.models.Teacher;
 import com.example.LMS_sb.models.User;
 import com.example.LMS_sb.models.enums.Role;
@@ -36,4 +37,16 @@ public class TeacherService {
 
     }
 
+    public Teacher getTeacherByUserEmail(String email) {
+        return teacherRepository.findByUserEmail(email).orElseThrow(()-> new RuntimeException("Teacher not found with email: "+email));
+    }
+
+    public TeacherMeDto convertToDto(Teacher teacher) {
+        TeacherMeDto dto = new TeacherMeDto();
+        dto.setName(teacher.getUser().getName());
+        dto.setEmail(teacher.getUser().getEmail());
+        dto.setRole(teacher.getUser().getRole());
+        dto.setExpertise(teacher.getExpertise());
+        return dto;
+    }
 }

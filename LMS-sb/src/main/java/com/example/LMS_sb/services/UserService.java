@@ -1,6 +1,7 @@
 package com.example.LMS_sb.services;
 
 import com.example.LMS_sb.dtos.UserDto;
+import com.example.LMS_sb.models.User;
 import com.example.LMS_sb.repository.StudentRepository;
 import com.example.LMS_sb.repository.UserRepository;
 import com.example.LMS_sb.security.UserDetailsImpl;
@@ -13,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -35,5 +38,8 @@ public class UserService {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String jwt = jwtUtils.generateToken(userDetails);
         return new JwtAuthenticationResponse(jwt);
+    }
+    public User getUserByEmail(String email){
+        return userRepository.findByEmail(email).orElseThrow(()-> new RuntimeException("User not found with email: "+email));
     }
 }
