@@ -5,20 +5,16 @@ import com.example.LMS_sb.dtos.*;
 import com.example.LMS_sb.models.Student;
 import com.example.LMS_sb.models.Teacher;
 import com.example.LMS_sb.models.User;
+import com.example.LMS_sb.models.UserSecurity;
 import com.example.LMS_sb.security.UserDetailsImpl;
-import com.example.LMS_sb.services.AdminService;
-import com.example.LMS_sb.services.StudentService;
-import com.example.LMS_sb.services.TeacherService;
-import com.example.LMS_sb.services.UserService;
+import com.example.LMS_sb.services.*;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -28,6 +24,7 @@ public class AuthController {
     private TeacherService teacherService;
     private UserService userService;
     private AdminService adminService;
+    private UserSecurityService userSecurityService;
 
 
     @PostMapping("/api/auth/register/student")
@@ -47,7 +44,7 @@ public class AuthController {
     @PostMapping("/api/auth/login")
     public ResponseEntity<?> loginUser(@RequestBody UserDto dto){
 
-        return ResponseEntity.ok(userService.checkValidityOfUserAndAuthenticate(dto));
+        return ResponseEntity.ok(userService.login(dto));
 
     }
     @GetMapping("/api/auth/me")
@@ -76,5 +73,25 @@ public class AuthController {
         }
         throw new RuntimeException("Invalid Role");
     }
+
+    @PostMapping("/api/auth/reset-password")
+    public ResponseEntity<?> resetFirstLoginPassword(
+            @Valid @RequestBody ResetPasswordDto dto
+    ){
+        User user = userService.getUserByEmail(dto.getEmail());
+
+        UserSecurity security = userSecurityService.getUserSecurityByUser(user);
+        userSecurityService.resetPassword(security,dto.getNewPassword());
+
+        return ResponseEntity.ok("Password reset successful");
+
+    }
+    @PostMapping("/api/auth/unlock-user")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> unlockUser(@RequestBody UnlockUserDto dto){
+        adminService.unlockUser(dto);
+        return ResponseEntity.ok("Unlocked user successfully");
+    }
+
 
 }

@@ -3,7 +3,9 @@ package com.example.LMS_sb.services;
 import com.example.LMS_sb.dtos.UserDto;
 import com.example.LMS_sb.models.User;
 import com.example.LMS_sb.models.UserSecurity;
+import com.example.LMS_sb.models.enums.Role;
 import com.example.LMS_sb.repository.UserRepository;
+import com.example.LMS_sb.repository.UserSecurityRepository;
 import com.example.LMS_sb.security.UserDetailsImpl;
 import com.example.LMS_sb.security.jwt.JwtAuthenticationResponse;
 import com.example.LMS_sb.security.jwt.JwtUtils;
@@ -20,61 +22,89 @@ import java.time.temporal.ChronoUnit;
 
 
 @Service
-@AllArgsConstructor
 public class UserService {
 
-    private UserRepository userRepository;
-    private AuthenticationManager authenticationManager;
-    private JwtUtils jwtUtils;
-    private UserSecurityService userSecurityService;
+    private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
+    private final UserSecurityService userSecurityService;
+    private final UserSecurityRepository userSecurityRepository;
 
     @Value("${maximum.login.attempts}")
     private int maxLoginAttempts;
     @Value("${password.expiry.days}")
     private long passwordExpiryDays;
 
-     public JwtAuthenticationResponse checkValidityOfUserAndAuthenticate(UserDto dto){
+    public UserService(
+            UserRepository userRepository,
+            AuthenticationManager authenticationManager,
+            JwtUtils jwtUtils,
+            UserSecurityService userSecurityService,
+            UserSecurityRepository userSecurityRepository
+    ) {
+        this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtils = jwtUtils;
+        this.userSecurityService = userSecurityService;
+        this.userSecurityRepository = userSecurityRepository;
+    }
+
+     public JwtAuthenticationResponse login(UserDto dto){
 
          User user = getUserByEmail(dto.getEmail());
          UserSecurity userSecurity = userSecurityService.getUserSecurityByUser(user);
-         if(userSecurity.isAccountLocked()){
-             throw new RuntimeException("Account is locked. Please contact admin.");
+         if(userSecurity.isAccountLocked() && user.getRole()!= Role.ADMIN){
+             throw new RuntimeException("ACCOUNT_LOCKED_CONTACT_ADMIN");
          }
 
-         if(userSecurity.isFirstLogin()){
-             throw new RuntimeException("Password reset required for first login");
+         if(userSecurity.isPasswordResetRequired() && user.getRole()!= Role.ADMIN){
+             throw new RuntimeException("PASSWORD_RESET_REQUIRED");
          }
-         if(userSecurity.getLastPasswordChange() != null && !userSecurity.isFirstLogin() ){
+         if(userSecurity.getLastPasswordChange() != null && user.getRole()!= Role.ADMIN){
              long daysSincePasswordChange = ChronoUnit.DAYS.between(
                      userSecurity.getLastPasswordChange(),
                      LocalDateTime.now()
              );
              if (daysSincePasswordChange >= passwordExpiryDays) {
-                 throw new RuntimeException("Password reset required. Password expired after 30 days.");
+                 throw new RuntimeException("PASSWORD_EXPIRED");
              }
          }
-         if(!userSecurity.isFirstLogin() && userSecurity.getFailedLoginAttempts()>=maxLoginAttempts){
+         if(!userSecurity.isFirstLogin() && userSecurity.getFailedLoginAttempts()>=maxLoginAttempts && user.getRole()!= Role.ADMIN){
              userSecurity.setAccountLocked(true);
-             throw new RuntimeException("Account locked due to multiple failed login attempts. Please contact admin.");
+             throw new RuntimeException("ACCOUNT_LOCKED_CONTACT_ADMIN");
          }
-         return authenticateUser(dto);
+         return authenticateUser(dto,userSecurity,user);
 
      }
 
 
 
-    public JwtAuthenticationResponse authenticateUser(UserDto dto){
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        dto.getEmail(),
-                        dto.getPassword()
-                )
+    public JwtAuthenticationResponse authenticateUser(UserDto dto,UserSecurity security,User user){
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            dto.getEmail(),
+                            dto.getPassword()
+                    )
 
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        String jwt = jwtUtils.generateToken(userDetails);
-        return new JwtAuthenticationResponse(jwt);
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            security.setFailedLoginAttempts(0);
+            userSecurityRepository.save(security);
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            String jwt = jwtUtils.generateToken(userDetails);
+            return new JwtAuthenticationResponse(jwt);
+        } catch (Exception e) {
+            security.setFailedLoginAttempts(security.getFailedLoginAttempts() + 1);
+
+            if (security.getFailedLoginAttempts() >= maxLoginAttempts && user.getRole() != Role.ADMIN) {
+                security.setAccountLocked(true);
+            }
+
+            userSecurityRepository.save(security);
+
+            throw e;
+        }
     }
     public User getUserByEmail(String email){
         return userRepository.findByEmail(email).orElseThrow(()-> new RuntimeException("User not found with email: "+email));

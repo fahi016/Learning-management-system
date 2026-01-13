@@ -2,6 +2,7 @@ package com.example.LMS_sb.security;
 
 
 import com.example.LMS_sb.models.User;
+import com.example.LMS_sb.models.UserSecurity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,7 +23,6 @@ public class UserDetailsImpl implements UserDetails {
     private String email;
     private String password;
     private String role;
-
     private Collection<? extends GrantedAuthority> authorities;
 
     public UserDetailsImpl(Long id, String email, String password, String role,Collection<? extends GrantedAuthority> authorities) {
@@ -33,13 +33,13 @@ public class UserDetailsImpl implements UserDetails {
         this.role = role;
     }
 
-    public static UserDetailsImpl build(User user){
+    public static UserDetailsImpl build(User user, UserSecurity security){
         String roleName = user.getRole().name();
-        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_"+user.getRole().name());
+        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_"+roleName);
         return new UserDetailsImpl(
                 user.getId(),
                 user.getEmail(),
-                user.getPassword(),
+                security.getPasswordHash(),
                 roleName,
                 Collections.singletonList(authority)
         );

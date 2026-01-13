@@ -9,6 +9,7 @@ import com.example.LMS_sb.models.enums.Role;
 import com.example.LMS_sb.repository.TeacherRepository;
 import com.example.LMS_sb.repository.UserRepository;
 import com.example.LMS_sb.repository.UserSecurityRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,24 +24,19 @@ public class TeacherService {
     private TeacherRepository teacherRepository;
     private PasswordEncoder passwordEncoder;
     private UserSecurityRepository userSecurityRepository;
+    private UserSecurityService userSecurityService;
 
-
+    @Transactional
     public void createTeacher(CreateTeacherRequestDto dto) {
-        String encodedPassword = passwordEncoder.encode(dto.getPassword());
         User user = new User();
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
-        user.setPassword(encodedPassword);
         user.setRole(Role.TEACHER);
 
         userRepository.save(user);
 
-        UserSecurity userSecurity = new UserSecurity();
-        userSecurity.setUser(user);
-        userSecurity.setPasswordHash(encodedPassword);
-        userSecurity.setLastPasswordChange(LocalDateTime.now());
+        userSecurityService.createForNewUser(user,dto.getPassword());
 
-        userSecurityRepository.save(userSecurity);
 
         Teacher teacher = new Teacher();
         teacher.setExpertise(dto.getExpertise());
