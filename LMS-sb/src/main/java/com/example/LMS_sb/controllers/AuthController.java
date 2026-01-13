@@ -47,7 +47,7 @@ public class AuthController {
     @PostMapping("/api/auth/login")
     public ResponseEntity<?> loginUser(@RequestBody UserDto dto){
 
-        return ResponseEntity.ok(userService.authenticateUser(dto));
+        return ResponseEntity.ok(userService.checkValidityOfUserAndAuthenticate(dto));
 
     }
     @GetMapping("/api/auth/me")
