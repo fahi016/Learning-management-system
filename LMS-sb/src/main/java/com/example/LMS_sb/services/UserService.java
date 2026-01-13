@@ -1,6 +1,10 @@
 package com.example.LMS_sb.services;
 
 import com.example.LMS_sb.dtos.UserDto;
+import com.example.LMS_sb.exceptions.AccountLockedException;
+import com.example.LMS_sb.exceptions.PasswordExpiredException;
+import com.example.LMS_sb.exceptions.PasswordResetRequiredException;
+import com.example.LMS_sb.exceptions.UserNotFoundException;
 import com.example.LMS_sb.models.User;
 import com.example.LMS_sb.models.UserSecurity;
 import com.example.LMS_sb.models.enums.Role;
@@ -54,11 +58,11 @@ public class UserService {
          User user = getUserByEmail(dto.getEmail());
          UserSecurity userSecurity = userSecurityService.getUserSecurityByUser(user);
          if(userSecurity.isAccountLocked() && user.getRole()!= Role.ADMIN){
-             throw new RuntimeException("ACCOUNT_LOCKED_CONTACT_ADMIN");
+             throw new AccountLockedException();
          }
 
          if(userSecurity.isPasswordResetRequired() && user.getRole()!= Role.ADMIN){
-             throw new RuntimeException("PASSWORD_RESET_REQUIRED");
+             throw new PasswordResetRequiredException();
          }
          if(userSecurity.getLastPasswordChange() != null && user.getRole()!= Role.ADMIN){
              long daysSincePasswordChange = ChronoUnit.DAYS.between(
@@ -66,12 +70,12 @@ public class UserService {
                      LocalDateTime.now()
              );
              if (daysSincePasswordChange >= passwordExpiryDays) {
-                 throw new RuntimeException("PASSWORD_EXPIRED");
+                 throw new PasswordExpiredException();
              }
          }
          if(!userSecurity.isFirstLogin() && userSecurity.getFailedLoginAttempts()>=maxLoginAttempts && user.getRole()!= Role.ADMIN){
              userSecurity.setAccountLocked(true);
-             throw new RuntimeException("ACCOUNT_LOCKED_CONTACT_ADMIN");
+             throw new AccountLockedException();
          }
          return authenticateUser(dto,userSecurity,user);
 
@@ -107,6 +111,6 @@ public class UserService {
         }
     }
     public User getUserByEmail(String email){
-        return userRepository.findByEmail(email).orElseThrow(()-> new RuntimeException("User not found with email: "+email));
+        return userRepository.findByEmail(email).orElseThrow(()-> new UserNotFoundException(email));
     }
 }

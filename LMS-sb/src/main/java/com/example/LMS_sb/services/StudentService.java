@@ -2,6 +2,7 @@ package com.example.LMS_sb.services;
 
 import com.example.LMS_sb.dtos.CreateStudentRequestDto;
 import com.example.LMS_sb.dtos.StudentMeDto;
+import com.example.LMS_sb.exceptions.UserNotFoundException;
 import com.example.LMS_sb.models.Student;
 import com.example.LMS_sb.models.User;
 import com.example.LMS_sb.models.UserSecurity;
@@ -45,7 +46,7 @@ public class StudentService {
     }
 
     public Student getStudentByUserEmail(String email){
-        return studentRepository.findByUserEmail(email).orElseThrow(()->new RuntimeException("Student not found with email: "+email));
+        return studentRepository.findByUserEmail(email).orElseThrow(()->new UserNotFoundException(email));
 
     }
 

@@ -2,6 +2,7 @@ package com.example.LMS_sb.services;
 
 import com.example.LMS_sb.dtos.CreateTeacherRequestDto;
 import com.example.LMS_sb.dtos.TeacherMeDto;
+import com.example.LMS_sb.exceptions.UserNotFoundException;
 import com.example.LMS_sb.models.Teacher;
 import com.example.LMS_sb.models.User;
 import com.example.LMS_sb.models.UserSecurity;
@@ -47,7 +48,7 @@ public class TeacherService {
     }
 
     public Teacher getTeacherByUserEmail(String email) {
-        return teacherRepository.findByUserEmail(email).orElseThrow(()-> new RuntimeException("Teacher not found with email: "+email));
+        return teacherRepository.findByUserEmail(email).orElseThrow(()-> new UserNotFoundException(email));
     }
 
     public TeacherMeDto convertToDto(Teacher teacher) {
