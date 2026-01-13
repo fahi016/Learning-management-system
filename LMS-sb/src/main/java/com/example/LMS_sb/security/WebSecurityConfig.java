@@ -68,7 +68,8 @@ public class WebSecurityConfig {
                         )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/reset-password").permitAll()
+                        .requestMatchers("/api/auth/reset-password").hasAuthority("PASSWORD_RESET")
+
                         .requestMatchers("/api/auth/me").authenticated()
                         .requestMatchers("/api/auth/register/**").hasRole("ADMIN")
                         .requestMatchers("/api/auth/unlock-user").hasRole("ADMIN")

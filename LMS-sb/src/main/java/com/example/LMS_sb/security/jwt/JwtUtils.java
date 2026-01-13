@@ -47,6 +47,16 @@ public class JwtUtils {
                 .compact();
 
     }
+    public String generatePasswordResetToken(UserDetailsImpl userDetails){
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .claim("scope","PASSWORD_RESET")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis()+15*60*1000))
+                .signWith(key())
+                .compact();
+
+    }
 
     public String getUsernameFromJwtToken(String token){
         return Jwts.parser()
@@ -68,4 +78,18 @@ public class JwtUtils {
             return false;
         }
     }
+
+    public String getScope(String token) {
+        try {
+            return Jwts.parser()
+                    .verifyWith((SecretKey) key())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get("scope", String.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

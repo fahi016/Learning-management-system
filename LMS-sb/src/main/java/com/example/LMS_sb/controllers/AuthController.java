@@ -75,22 +75,35 @@ public class AuthController {
     }
 
     @PostMapping("/api/auth/reset-password")
+    @PreAuthorize("hasAuthority('PASSWORD_RESET')")
     public ResponseEntity<?> resetFirstLoginPassword(
-            @Valid @RequestBody ResetPasswordDto dto
-    ){
-        User user = userService.getUserByEmail(dto.getEmail());
+            @Valid @RequestBody ResetPasswordDto dto,
+            Authentication authentication
+    ) {
+
+        User user = userService.getUserByEmail(authentication.getName());
 
         UserSecurity security = userSecurityService.getUserSecurityByUser(user);
-        userSecurityService.resetPassword(security,dto.getNewPassword());
+        userSecurityService.resetPassword(security, dto.getNewPassword());
 
         return ResponseEntity.ok("Password reset successful");
-
     }
     @PostMapping("/api/auth/unlock-user")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> unlockUser(@RequestBody UnlockUserDto dto){
         adminService.unlockUser(dto);
         return ResponseEntity.ok("Unlocked user successfully");
+    }
+
+    @PostMapping("/api/auth/change-password")
+    @PreAuthorize("isAuthenticated() and !hasAuthority('PASSWORD_RESET')")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDto dto,
+      Authentication authentication
+    ){
+        String email = authentication.getName();
+        adminService.changePassword(email,dto);
+        return ResponseEntity.ok("Password changed successfully");
+
     }
 
 

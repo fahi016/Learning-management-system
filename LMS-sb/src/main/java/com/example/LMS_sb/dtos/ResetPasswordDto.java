@@ -7,10 +7,9 @@ import lombok.Data;
 @Data
 public class ResetPasswordDto {
 
-    private String email;
 
-    @NotBlank(message = "New password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+
+    @NotBlank
+    @Size(min = 8)
     private String newPassword;
-
 }

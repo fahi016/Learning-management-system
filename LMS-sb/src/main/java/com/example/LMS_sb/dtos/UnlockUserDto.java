@@ -7,4 +7,5 @@ import lombok.Data;
 @Data
 public class UnlockUserDto {
     private String email;
+    private String newPassword;
 }

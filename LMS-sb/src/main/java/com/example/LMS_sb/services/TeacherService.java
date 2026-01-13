@@ -48,7 +48,7 @@ public class TeacherService {
     }
 
     public Teacher getTeacherByUserEmail(String email) {
-        return teacherRepository.findByUserEmail(email).orElseThrow(()-> new UserNotFoundException(email));
+        return teacherRepository.findByUserEmail(email).orElseThrow(()-> new UserNotFoundException());
     }
 
     public TeacherMeDto convertToDto(Teacher teacher) {

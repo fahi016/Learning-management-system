@@ -1,19 +1,37 @@
 package com.example.LMS_sb.services;
 
 import com.example.LMS_sb.dtos.AdminMeDto;
+import com.example.LMS_sb.dtos.ChangePasswordDto;
 import com.example.LMS_sb.dtos.UnlockUserDto;
+import com.example.LMS_sb.exceptions.IllegalOperationException;
+import com.example.LMS_sb.exceptions.PasswordOperationException;
 import com.example.LMS_sb.models.User;
 import com.example.LMS_sb.models.UserSecurity;
 import com.example.LMS_sb.repository.UserSecurityRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
-@AllArgsConstructor
 public class AdminService {
-    private UserService userService;
-    private UserSecurityService userSecurityService;
-    private UserSecurityRepository userSecurityRepository;
+    private final UserService userService;
+    private final UserSecurityService userSecurityService;
+    private final UserSecurityRepository userSecurityRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Value("${admin.email}")
+    private String adminEmail;
+
+
+    public AdminService(UserService userService, UserSecurityService userSecurityService, UserSecurityRepository userSecurityRepository, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.userSecurityService = userSecurityService;
+        this.userSecurityRepository = userSecurityRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public AdminMeDto converToDto(User privateUser) {
         AdminMeDto dto = new AdminMeDto();
@@ -24,12 +42,36 @@ public class AdminService {
     }
 
     public void unlockUser(UnlockUserDto dto) {
+        if (dto.getEmail().equals(adminEmail)) {
+            throw new IllegalOperationException("Cannot unlock your own account");
+        }
         User user = userService.getUserByEmail(dto.getEmail());
         UserSecurity userSecurity = userSecurityService.getUserSecurityByUser(user);
+        userSecurity.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
         userSecurity.setAccountLocked(false);
         userSecurity.setFailedLoginAttempts(0);
         userSecurity.setPasswordResetRequired(true);
         userSecurityRepository.save(userSecurity);
 
+    }
+
+    public void changePassword(String email, ChangePasswordDto dto) {
+        User user = userService.getUserByEmail(email);
+        UserSecurity security = userSecurityService.getUserSecurityByUser(user);
+
+        if(!passwordEncoder.matches(dto.getCurrentPassword(), security.getPasswordHash())){
+            throw new PasswordOperationException("CURRENT_PASSWORD_INCORRECT");
+        }
+        if (passwordEncoder.matches(dto.getNewPassword(), security.getPasswordHash())) {
+            throw new PasswordOperationException("NEW_PASSWORD_MUST_BE_DIFFERENT");
+        }
+        security.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
+        security.setLastPasswordChange(LocalDateTime.now());
+        security.setFirstLogin(false);
+        security.setPasswordResetRequired(false);
+        security.setFailedLoginAttempts(0);
+        security.setAccountLocked(false);
+
+        userSecurityRepository.save(security);
     }
 }

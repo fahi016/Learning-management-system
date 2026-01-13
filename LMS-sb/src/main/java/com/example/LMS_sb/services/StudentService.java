@@ -46,7 +46,7 @@ public class StudentService {
     }
 
     public Student getStudentByUserEmail(String email){
-        return studentRepository.findByUserEmail(email).orElseThrow(()->new UserNotFoundException(email));
+        return studentRepository.findByUserEmail(email).orElseThrow(()->new UserNotFoundException());
 
     }
 

@@ -57,14 +57,25 @@ public class UserService {
 
          User user = getUserByEmail(dto.getEmail());
          UserSecurity userSecurity = userSecurityService.getUserSecurityByUser(user);
-         if(userSecurity.isAccountLocked() && user.getRole()!= Role.ADMIN){
+         if(userSecurity.isAccountLocked()){
              throw new AccountLockedException();
          }
 
-         if(userSecurity.isPasswordResetRequired() && user.getRole()!= Role.ADMIN){
-             throw new PasswordResetRequiredException();
+         if(userSecurity.isPasswordResetRequired()){
+
+             Authentication auth = authenticationManager.authenticate(
+                     new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
+             );
+
+             UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
+             String resetToken = jwtUtils.generatePasswordResetToken(userDetails);
+
+             return new JwtAuthenticationResponse(
+                     resetToken,
+                     "PASSWORD_RESET_REQUIRED"
+             );
          }
-         if(userSecurity.getLastPasswordChange() != null && user.getRole()!= Role.ADMIN){
+         if(userSecurity.getLastPasswordChange() != null){
              long daysSincePasswordChange = ChronoUnit.DAYS.between(
                      userSecurity.getLastPasswordChange(),
                      LocalDateTime.now()
@@ -73,7 +84,7 @@ public class UserService {
                  throw new PasswordExpiredException();
              }
          }
-         if(!userSecurity.isFirstLogin() && userSecurity.getFailedLoginAttempts()>=maxLoginAttempts && user.getRole()!= Role.ADMIN){
+         if(!userSecurity.isFirstLogin() && userSecurity.getFailedLoginAttempts()>=maxLoginAttempts){
              userSecurity.setAccountLocked(true);
              throw new AccountLockedException();
          }
@@ -97,7 +108,7 @@ public class UserService {
             userSecurityRepository.save(security);
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             String jwt = jwtUtils.generateToken(userDetails);
-            return new JwtAuthenticationResponse(jwt);
+            return new JwtAuthenticationResponse(jwt,"AUTHENTICATION_SUCCESSFUL");
         } catch (Exception e) {
             security.setFailedLoginAttempts(security.getFailedLoginAttempts() + 1);
 
@@ -111,6 +122,6 @@ public class UserService {
         }
     }
     public User getUserByEmail(String email){
-        return userRepository.findByEmail(email).orElseThrow(()-> new UserNotFoundException(email));
+        return userRepository.findByEmail(email).orElseThrow(()-> new UserNotFoundException());
     }
 }
