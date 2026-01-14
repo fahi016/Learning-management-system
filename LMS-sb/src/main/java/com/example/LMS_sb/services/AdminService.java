@@ -3,10 +3,13 @@ package com.example.LMS_sb.services;
 import com.example.LMS_sb.dtos.*;
 import com.example.LMS_sb.exceptions.IllegalOperationException;
 import com.example.LMS_sb.exceptions.PasswordOperationException;
+import com.example.LMS_sb.exceptions.UserNotFoundException;
+import com.example.LMS_sb.models.Student;
 import com.example.LMS_sb.models.User;
 import com.example.LMS_sb.models.UserSecurity;
 import com.example.LMS_sb.repository.UserRepository;
 import com.example.LMS_sb.repository.UserSecurityRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminService {
@@ -42,7 +46,7 @@ public class AdminService {
         dto.setRole(privateUser.getRole());
         return dto;
     }
-
+    @Transactional
     public void unlockUser(UnlockUserDto dto) {
         if (dto.getEmail().equals(adminEmail)) {
             throw new IllegalOperationException("Cannot unlock your own account");
@@ -89,5 +93,27 @@ public class AdminService {
 
 
 
+    }
+
+    public GetUserDto getUserById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        return new GetUserDto(
+                user.getName(),
+                user.getEmail(),
+                user.getRole()
+        );
+    }
+    @Transactional
+    public void updateUserById(Long id, GetUserDto dto) {
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setRole(dto.getRole());
+        userRepository.save(user);
+    }
+
+    public void deleteUserById(long id) {
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        userRepository.delete(user);
     }
 }

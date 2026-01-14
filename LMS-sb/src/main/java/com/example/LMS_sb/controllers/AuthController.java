@@ -82,7 +82,6 @@ public class AuthController {
     ) {
 
         User user = userService.getUserByEmail(authentication.getName());
-
         UserSecurity security = userSecurityService.getUserSecurityByUser(user);
         userSecurityService.resetPassword(security, dto.getNewPassword());
 

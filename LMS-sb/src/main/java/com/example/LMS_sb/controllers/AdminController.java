@@ -5,9 +5,7 @@ import com.example.LMS_sb.services.AdminService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -20,6 +18,24 @@ public class AdminController {
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(){
        return ResponseEntity.ok(adminService.getAllUsers());
+
+    }
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable long id){
+        return ResponseEntity.ok(adminService.getUserById(id));
+
+    }
+    @PutMapping("/users/{id}")
+    public ResponseEntity<?> updateUserById(@PathVariable long id, @RequestBody GetUserDto dto){
+        adminService.updateUserById(id,dto);
+        return ResponseEntity.ok("User updated successfully");
+
+    }
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUserById(@PathVariable long id){
+        adminService.deleteUserById(id);
+        return ResponseEntity.ok("User deleted");
 
     }
 
