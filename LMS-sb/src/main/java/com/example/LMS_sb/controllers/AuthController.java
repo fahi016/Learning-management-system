@@ -53,12 +53,12 @@ public class AuthController {
         switch (user.getRole()) {
             case "STUDENT" -> {
                 Student student = studentService.getStudentByUserEmail(user.getEmail());
-                StudentMeDto dto = studentService.convertToDto(student);
+                StudentDto dto = studentService.convertToDto(student);
                 return ResponseEntity.ok(dto);
             }
             case "TEACHER" -> {
                 Teacher teacher = teacherService.getTeacherByUserEmail(user.getEmail());
-                TeacherMeDto dto = teacherService.convertToDto(teacher);
+                TeacherDto dto = teacherService.convertToDto(teacher);
                 return ResponseEntity.ok(dto);
 
 

@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface UserSecurityRepository extends JpaRepository<UserSecurity,Long> {
     Optional<UserSecurity> findUserSecurityByUser(User user);
+    void deleteByUserId(Long id);
 }

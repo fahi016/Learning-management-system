@@ -33,6 +33,27 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @OneToOne(
+            mappedBy = "user",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
+    private Student student;
+
+    @OneToOne(
+            mappedBy = "user",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
+    private Teacher teacher;
+
+    @OneToOne(
+            mappedBy = "user",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
+    private UserSecurity userSecurity;
+
 
     @PrePersist
     public void onCreate(){

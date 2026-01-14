@@ -1,11 +1,10 @@
 package com.example.LMS_sb.services;
 
 import com.example.LMS_sb.dtos.CreateTeacherRequestDto;
-import com.example.LMS_sb.dtos.TeacherMeDto;
+import com.example.LMS_sb.dtos.TeacherDto;
 import com.example.LMS_sb.exceptions.UserNotFoundException;
 import com.example.LMS_sb.models.Teacher;
 import com.example.LMS_sb.models.User;
-import com.example.LMS_sb.models.UserSecurity;
 import com.example.LMS_sb.models.enums.Role;
 import com.example.LMS_sb.repository.TeacherRepository;
 import com.example.LMS_sb.repository.UserRepository;
@@ -14,8 +13,6 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
@@ -48,14 +45,13 @@ public class TeacherService {
     }
 
     public Teacher getTeacherByUserEmail(String email) {
-        return teacherRepository.findByUserEmail(email).orElseThrow(()-> new UserNotFoundException());
+        return teacherRepository.findByUserEmail(email).orElseThrow(UserNotFoundException::new);
     }
 
-    public TeacherMeDto convertToDto(Teacher teacher) {
-        TeacherMeDto dto = new TeacherMeDto();
+    public TeacherDto convertToDto(Teacher teacher) {
+        TeacherDto dto = new TeacherDto();
         dto.setName(teacher.getUser().getName());
         dto.setEmail(teacher.getUser().getEmail());
-        dto.setRole(teacher.getUser().getRole());
         dto.setExpertise(teacher.getExpertise());
         return dto;
     }

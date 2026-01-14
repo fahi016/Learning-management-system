@@ -1,21 +1,16 @@
 package com.example.LMS_sb.services;
 
 import com.example.LMS_sb.dtos.CreateStudentRequestDto;
-import com.example.LMS_sb.dtos.StudentMeDto;
+import com.example.LMS_sb.dtos.StudentDto;
 import com.example.LMS_sb.exceptions.UserNotFoundException;
 import com.example.LMS_sb.models.Student;
 import com.example.LMS_sb.models.User;
-import com.example.LMS_sb.models.UserSecurity;
 import com.example.LMS_sb.models.enums.Role;
 import com.example.LMS_sb.repository.StudentRepository;
 import com.example.LMS_sb.repository.UserRepository;
-import com.example.LMS_sb.repository.UserSecurityRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
@@ -50,11 +45,10 @@ public class StudentService {
 
     }
 
-    public StudentMeDto convertToDto(Student student) {
-        StudentMeDto dto = new StudentMeDto();
+    public StudentDto convertToDto(Student student) {
+        StudentDto dto = new StudentDto();
         dto.setName(student.getUser().getName());
         dto.setEmail(student.getUser().getEmail());
-        dto.setRole(student.getUser().getRole());
         dto.setRollNumber(student.getRollNumber());
         dto.setDepartment(student.getDepartment());
         return dto;
