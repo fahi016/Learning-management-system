@@ -2,6 +2,7 @@ package com.example.LMS_sb.services;
 
 import com.example.LMS_sb.dtos.CreateStudentRequestDto;
 import com.example.LMS_sb.dtos.StudentDto;
+import com.example.LMS_sb.dtos.UpdateMeByStudentDto;
 import com.example.LMS_sb.exceptions.UserNotFoundException;
 import com.example.LMS_sb.models.Student;
 import com.example.LMS_sb.models.User;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-
+@Transactional
 public class StudentService {
 
     private UserRepository userRepository;
@@ -23,7 +24,7 @@ public class StudentService {
     private StudentRepository studentRepository;
     private UserSecurityService userSecurityService;
 
-    @Transactional
+
     public void createStudent(CreateStudentRequestDto dto) {
         User user = new User();
         user.setName(dto.getName());
@@ -66,5 +67,15 @@ public class StudentService {
                     student.getDepartment()
 
             );
+    }
+    public void updateMyProfile(UpdateMeByStudentDto dto, Authentication authentication) {
+        Student student = studentRepository.findByUserEmail(authentication.getName()).orElseThrow(UserNotFoundException::new);
+        User user = student.getUser();
+        user.setName(dto.getName());
+        student.setDepartment(dto.getDepartment());
+        student.setRollNumber(dto.getRollNumber());
+        student.setUser(user);
+        user.setStudent(student);
+        userRepository.save(user);
     }
 }

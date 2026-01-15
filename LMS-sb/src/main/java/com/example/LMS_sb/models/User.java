@@ -35,14 +35,14 @@ public class User {
 
     @OneToOne(
             mappedBy = "user",
-            cascade = CascadeType.REMOVE,
+            cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     private Student student;
 
     @OneToOne(
             mappedBy = "user",
-            cascade = CascadeType.REMOVE,
+            cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     private Teacher teacher;
