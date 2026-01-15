@@ -10,13 +10,16 @@ import com.example.LMS_sb.repository.StudentRepository;
 import com.example.LMS_sb.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+
 public class StudentService {
 
     private UserRepository userRepository;
+    private UserService userService;
     private StudentRepository studentRepository;
     private UserSecurityService userSecurityService;
 
@@ -41,7 +44,7 @@ public class StudentService {
     }
 
     public Student getStudentByUserEmail(String email){
-        return studentRepository.findByUserEmail(email).orElseThrow(()->new UserNotFoundException());
+        return studentRepository.findByUserEmail(email).orElseThrow(UserNotFoundException::new);
 
     }
 
@@ -52,5 +55,16 @@ public class StudentService {
         dto.setRollNumber(student.getRollNumber());
         dto.setDepartment(student.getDepartment());
         return dto;
+    }
+
+    public StudentDto getMyProfile(Authentication authentication) {
+            Student student = studentRepository.findByUserEmail(authentication.getName()).orElseThrow(UserNotFoundException::new);
+            return new StudentDto(
+                    student.getUser().getName(),
+                    student.getUser().getEmail(),
+                    student.getRollNumber(),
+                    student.getDepartment()
+
+            );
     }
 }
