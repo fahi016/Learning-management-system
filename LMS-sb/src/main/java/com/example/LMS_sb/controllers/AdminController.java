@@ -1,10 +1,10 @@
 package com.example.LMS_sb.controllers;
 
-import com.example.LMS_sb.dtos.GetUserDto;
-import com.example.LMS_sb.dtos.StudentDto;
-import com.example.LMS_sb.dtos.TeacherDto;
+import com.example.LMS_sb.dtos.*;
 import com.example.LMS_sb.services.AdminService;
+import com.example.LMS_sb.services.CourseService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 public class AdminController {
     AdminService adminService;
+    CourseService courseService;
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(){
@@ -85,6 +86,36 @@ public class AdminController {
     public ResponseEntity<?> deleteTeacherById(@PathVariable Long id){
         adminService.deleteTeacherById(id);
         return ResponseEntity.ok("Teacher deleted");
+
+    }
+
+    @PostMapping("/courses")
+    public ResponseEntity<?> createCourse(@RequestBody CourseDto dto){
+        courseService.createCourse(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Course created successfully");
+
+    }
+    @GetMapping("/courses")
+    public ResponseEntity<?> getCourseById(){
+        return ResponseEntity.ok(courseService.getAllCourses());
+
+    }
+    @GetMapping("/courses/{id}")
+    public ResponseEntity<?> getCourseById(@PathVariable Long id){
+        return ResponseEntity.ok(courseService.getCourseById(id));
+
+    }
+    @PutMapping("/courses/{id}")
+    public ResponseEntity<?> updateCourseById(@PathVariable Long id, @RequestBody CourseDto dto){
+        courseService.updateCourseById(id,dto);
+        return ResponseEntity.ok("Course updated successfully");
+
+    }
+    @DeleteMapping("/courses/{id}")
+    public ResponseEntity<?> deleteCourseById(@PathVariable Long id){
+        courseService.deleteCourseById(id);
+        return ResponseEntity.ok("Course deleted");
 
     }
 
