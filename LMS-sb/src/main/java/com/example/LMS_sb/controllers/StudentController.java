@@ -2,6 +2,7 @@ package com.example.LMS_sb.controllers;
 
 import com.example.LMS_sb.dtos.StudentDto;
 import com.example.LMS_sb.dtos.UpdateMeByStudentDto;
+import com.example.LMS_sb.services.CourseService;
 import com.example.LMS_sb.services.StudentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 public class StudentController {
     StudentService studentService;
+    CourseService courseService;
 
     @GetMapping("/api/students/me")
     public ResponseEntity<?> getStudentProfile(Authentication authentication){
@@ -27,5 +29,10 @@ public class StudentController {
         studentService.updateMyProfile(dto,authentication);
         return ResponseEntity.ok("Your profile updated successfully");
 
+    }
+
+    @GetMapping("api/courses")
+    public ResponseEntity<?> getAllCourses(){
+      return ResponseEntity.ok(courseService.getAllCourses());
     }
 }
