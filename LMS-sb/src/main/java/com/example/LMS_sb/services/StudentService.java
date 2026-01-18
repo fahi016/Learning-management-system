@@ -51,6 +51,7 @@ public class StudentService {
 
     public StudentDto convertToDto(Student student) {
         StudentDto dto = new StudentDto();
+        dto.setId(student.getId());
         dto.setName(student.getUser().getName());
         dto.setEmail(student.getUser().getEmail());
         dto.setRollNumber(student.getRollNumber());
@@ -61,6 +62,7 @@ public class StudentService {
     public StudentDto getMyProfile(Authentication authentication) {
             Student student = studentRepository.findByUserEmail(authentication.getName()).orElseThrow(UserNotFoundException::new);
             return new StudentDto(
+                    student.getId(),
                     student.getUser().getName(),
                     student.getUser().getEmail(),
                     student.getRollNumber(),

@@ -127,6 +127,7 @@ public class AdminService {
     public List<StudentDto> getAllStudents() {
         return studentRepository.findAll().stream()
                 .map(student-> new StudentDto(
+                        student.getId(),
                         student.getUser().getName(),
                         student.getUser().getEmail(),
                         student.getRollNumber(),
@@ -139,6 +140,7 @@ public class AdminService {
     public StudentDto getStudentById(Long id) {
         Student student = studentRepository.findById(id).orElseThrow(UserNotFoundException::new);
         return new StudentDto(
+                student.getId(),
                 student.getUser().getName(),
                 student.getUser().getEmail(),
                 student.getRollNumber(),
@@ -168,6 +170,7 @@ public class AdminService {
     public List<TeacherDto> getAllTeachers() {
         return teacherRepository.findAll().stream()
                 .map(teacher-> new TeacherDto(
+                        teacher.getId(),
                         teacher.getUser().getName(),
                         teacher.getUser().getEmail(),
                         teacher.getExpertise()
@@ -188,6 +191,7 @@ public class AdminService {
     public TeacherDto getTeacherById(Long id) {
         Teacher teacher = teacherRepository.findById(id).orElseThrow(UserNotFoundException::new);
         return new TeacherDto(
+                teacher.getId(),
                 teacher.getUser().getName(),
                 teacher.getUser().getEmail(),
                 teacher.getExpertise()

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TeacherDto {
+    private Long id;
     private String name;
     private String email;
     private String expertise;

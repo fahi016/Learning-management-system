@@ -30,6 +30,7 @@ public class CourseService {
     public List<GetCourseDto> getAllCourses(){
         return courseRepository.findAll().stream().map(
                 course -> new GetCourseDto(
+                        course.getId(),
                         course.getTitle(),
                         course.getDescription(),
                         course.getTeacher().getUser().getName(),
@@ -41,6 +42,7 @@ public class CourseService {
     public GetCourseDto getCourseById(Long courseId) {
         Course course = courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);
         return new GetCourseDto(
+                course.getId(),
                 course.getTitle(),
                 course.getDescription(),
                 course.getTeacher().getUser().getName(),
@@ -78,7 +80,8 @@ public class CourseService {
         return enrollments.stream().map(
                 enrollment ->
                         new GetCourseDto(
-                             enrollment.getCourse().getTitle(),
+                                enrollment.getCourse().getId(),
+                                enrollment.getCourse().getTitle(),
                                 enrollment.getCourse().getDescription(),
                                 enrollment.getCourse().getTeacher().getUser().getName(),
                                 enrollment.getCourse().getCreatedAt()

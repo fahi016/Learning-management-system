@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetCourseDto {
+    private Long id;
     private String title;
     private String description;
     private String teacherName;
