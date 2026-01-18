@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 
 public class StudentController {
-    StudentService studentService;
-    CourseService courseService;
-    EnrollmentService enrollmentService;
+    private StudentService studentService;
+    private CourseService courseService;
+    private EnrollmentService enrollmentService;
+    private AssignmentService assignmentService;
+
 
 
     @GetMapping("/api/students/me")
@@ -55,5 +57,10 @@ public class StudentController {
     @GetMapping("api/students/courses")
     public ResponseEntity<?> getAllMyCourses(Authentication authentication){
         return ResponseEntity.ok(courseService.getAllMyCourses(authentication));
+    }
+
+    @GetMapping("api/students/assignments")
+    public ResponseEntity<?> viewMyAssignments(Authentication authentication){
+        return ResponseEntity.ok(assignmentService.getMyAssignments(authentication));
     }
 }

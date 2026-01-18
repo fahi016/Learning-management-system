@@ -12,6 +12,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class EnrollmentService {
@@ -27,5 +29,12 @@ public class EnrollmentService {
         enrollment.setCourse(course);
         enrollment.setStudent(student);
         enrollmentRepository.save(enrollment);
+    }
+
+    public List<Course> getCoursesByStudent(Student student) {
+        return enrollmentRepository.findByStudent(student).stream().map(
+                Enrollment::getCourse)
+                .toList();
+
     }
 }
