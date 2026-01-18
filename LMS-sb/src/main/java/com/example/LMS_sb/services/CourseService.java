@@ -2,6 +2,8 @@ package com.example.LMS_sb.services;
 
 
 import com.example.LMS_sb.dtos.CourseDto;
+import com.example.LMS_sb.exceptions.CourseNotFoundException;
+import com.example.LMS_sb.models.Course;
 import com.example.LMS_sb.repository.CourseRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -22,5 +24,14 @@ public class CourseService {
                         course.getTeacher().getUser().getName()
                 )
         ).toList();
+    }
+
+    public CourseDto getCourseById(Long courseId) {
+        Course course = courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);
+        return new CourseDto(
+                course.getTitle(),
+                course.getDescription(),
+                course.getTeacher().getUser().getName()
+        );
     }
 }
