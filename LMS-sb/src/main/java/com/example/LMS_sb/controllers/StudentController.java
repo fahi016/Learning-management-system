@@ -3,8 +3,10 @@ package com.example.LMS_sb.controllers;
 import com.example.LMS_sb.dtos.StudentDto;
 import com.example.LMS_sb.dtos.UpdateMeByStudentDto;
 import com.example.LMS_sb.services.CourseService;
+import com.example.LMS_sb.services.EnrollmentService;
 import com.example.LMS_sb.services.StudentService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 public class StudentController {
     StudentService studentService;
     CourseService courseService;
+    EnrollmentService enrollmentService;
+
 
     @GetMapping("/api/students/me")
     public ResponseEntity<?> getStudentProfile(Authentication authentication){
@@ -39,5 +43,17 @@ public class StudentController {
     @GetMapping("api/courses/{courseId}")
     public ResponseEntity<?> getCourseById(@PathVariable Long courseId){
         return ResponseEntity.ok(courseService.getCourseById(courseId));
+    }
+
+   @PostMapping("api/courses/enroll/{courseId}")
+    public ResponseEntity<?> EnrollInACourse(Authentication authentication,@PathVariable Long courseId){
+        enrollmentService.enrollInACourse(courseId,authentication);
+       return ResponseEntity.status(HttpStatus.CREATED).body("Enrolled successfully");
+
+   }
+
+    @GetMapping("api/students/courses")
+    public ResponseEntity<?> getAllMyCourses(Authentication authentication){
+        return ResponseEntity.ok(courseService.getAllMyCourses(authentication));
     }
 }

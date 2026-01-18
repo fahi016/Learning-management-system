@@ -6,10 +6,15 @@ import com.example.LMS_sb.dtos.GetCourseDto;
 import com.example.LMS_sb.exceptions.CourseNotFoundException;
 import com.example.LMS_sb.exceptions.UserNotFoundException;
 import com.example.LMS_sb.models.Course;
+import com.example.LMS_sb.models.Enrollment;
+import com.example.LMS_sb.models.Student;
 import com.example.LMS_sb.models.Teacher;
 import com.example.LMS_sb.repository.CourseRepository;
+import com.example.LMS_sb.repository.EnrollmentRepository;
+import com.example.LMS_sb.repository.StudentRepository;
 import com.example.LMS_sb.repository.TeacherRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,13 +24,16 @@ import java.util.List;
 public class CourseService {
     public final CourseRepository courseRepository;
     private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     public List<GetCourseDto> getAllCourses(){
         return courseRepository.findAll().stream().map(
                 course -> new GetCourseDto(
                         course.getTitle(),
                         course.getDescription(),
-                        course.getTeacher().getUser().getName()
+                        course.getTeacher().getUser().getName(),
+                        course.getCreatedAt()
                 )
         ).toList();
     }
@@ -35,7 +43,8 @@ public class CourseService {
         return new GetCourseDto(
                 course.getTitle(),
                 course.getDescription(),
-                course.getTeacher().getUser().getName()
+                course.getTeacher().getUser().getName(),
+                course.getCreatedAt()
         );
     }
 
@@ -61,5 +70,20 @@ public class CourseService {
     public void deleteCourseById(Long id) {
         Course course = courseRepository.findById(id).orElseThrow(CourseNotFoundException::new);
         courseRepository.delete(course);
+    }
+
+    public List<GetCourseDto> getAllMyCourses(Authentication authentication) {
+        Student student = studentRepository.findByUserEmail(authentication.getName()).orElseThrow(UserNotFoundException::new);
+        List<Enrollment> enrollments=  enrollmentRepository.findAllByStudentId(student.getId());
+        return enrollments.stream().map(
+                enrollment ->
+                        new GetCourseDto(
+                             enrollment.getCourse().getTitle(),
+                                enrollment.getCourse().getDescription(),
+                                enrollment.getCourse().getTeacher().getUser().getName(),
+                                enrollment.getCourse().getCreatedAt()
+
+                )
+        ).toList();
     }
 }
