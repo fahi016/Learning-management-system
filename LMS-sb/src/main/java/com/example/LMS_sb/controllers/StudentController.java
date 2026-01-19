@@ -1,5 +1,6 @@
 package com.example.LMS_sb.controllers;
 
+import com.example.LMS_sb.dtos.SubmissionCreateRequestDto;
 import com.example.LMS_sb.dtos.UpdateMeByStudentDto;
 import com.example.LMS_sb.services.*;
 import lombok.AllArgsConstructor;
@@ -69,5 +70,10 @@ public class StudentController {
     @GetMapping("api/students/submissions")
     public ResponseEntity<?> getMySubmissions(Authentication authentication){
         return ResponseEntity.ok(submissionService.getMySubmissions(authentication));
+    }
+    @PostMapping("api/students/submissions/{assignmentId}")
+    public ResponseEntity<?> submitAssignment(@PathVariable Long assignmentId,@RequestBody SubmissionCreateRequestDto dto, Authentication authentication){
+        return ResponseEntity.ok(submissionService.submitAssignment(assignmentId,dto,authentication));
+
     }
 }

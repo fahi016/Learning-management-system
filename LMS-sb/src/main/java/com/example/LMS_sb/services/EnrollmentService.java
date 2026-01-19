@@ -37,4 +37,8 @@ public class EnrollmentService {
                 .toList();
 
     }
+
+    public boolean isStudentEnrolled(Long studentId, Long courseId) {
+        return enrollmentRepository.existsByStudentIdAndCourseId(studentId,courseId);
+    }
 }

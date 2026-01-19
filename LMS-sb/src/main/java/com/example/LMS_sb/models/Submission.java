@@ -46,6 +46,10 @@ public class Submission {
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
+    @Column(name = "late_submission", nullable = false)
+    private boolean lateSubmission;
+
+
     @PrePersist
     public void onCreate() {
         this.submittedAt = LocalDateTime.now();

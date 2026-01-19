@@ -7,6 +7,7 @@ import com.example.LMS_sb.models.Assignment;
 import com.example.LMS_sb.models.Course;
 import com.example.LMS_sb.models.Student;
 import com.example.LMS_sb.repository.AssignmentRepository;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,5 +46,9 @@ public class AssignmentService {
                 assignment.getDueDate()
         );
 
+    }
+
+    public Assignment getAssignmentById(@NotNull Long assignmentId) {
+        return assignmentRepository.findById(assignmentId).orElseThrow(AssignmentNotFoundException::new);
     }
 }

@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository
 public interface SubmissionRepository extends JpaRepository<Submission,Long> {
     List<Submission> findAllByStudentId(Long studentId);
+    boolean existsByAssignmentIdAndStudentId(Long assignmentId, Long studentId);
+
 }
