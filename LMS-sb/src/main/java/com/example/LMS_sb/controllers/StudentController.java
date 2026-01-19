@@ -1,10 +1,7 @@
 package com.example.LMS_sb.controllers;
 
-import com.example.LMS_sb.dtos.StudentDto;
 import com.example.LMS_sb.dtos.UpdateMeByStudentDto;
-import com.example.LMS_sb.services.CourseService;
-import com.example.LMS_sb.services.EnrollmentService;
-import com.example.LMS_sb.services.StudentService;
+import com.example.LMS_sb.services.*;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +18,7 @@ public class StudentController {
     private CourseService courseService;
     private EnrollmentService enrollmentService;
     private AssignmentService assignmentService;
+    private SubmissionService submissionService;
 
 
 
@@ -66,5 +64,10 @@ public class StudentController {
     @GetMapping("api/students/assignments/{id}")
     public ResponseEntity<?> getMyAssignmentById(@PathVariable Long id){
         return ResponseEntity.ok(assignmentService.getMyAssignmentById(id));
+    }
+
+    @GetMapping("api/students/submissions")
+    public ResponseEntity<?> getMySubmissions(Authentication authentication){
+        return ResponseEntity.ok(submissionService.getMySubmissions(authentication));
     }
 }
