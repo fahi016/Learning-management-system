@@ -2,7 +2,9 @@ package com.example.LMS_sb.services;
 
 import com.example.LMS_sb.dtos.CreateTeacherRequestDto;
 import com.example.LMS_sb.dtos.TeacherDto;
+import com.example.LMS_sb.dtos.UpdateMeByTeacherDto;
 import com.example.LMS_sb.exceptions.UserNotFoundException;
+import com.example.LMS_sb.models.Student;
 import com.example.LMS_sb.models.Teacher;
 import com.example.LMS_sb.models.User;
 import com.example.LMS_sb.models.enums.Role;
@@ -11,6 +13,7 @@ import com.example.LMS_sb.repository.UserRepository;
 import com.example.LMS_sb.repository.UserSecurityRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -54,5 +57,26 @@ public class TeacherService {
         dto.setEmail(teacher.getUser().getEmail());
         dto.setExpertise(teacher.getExpertise());
         return dto;
+    }
+
+    public TeacherDto getMyProfile(Authentication authentication) {
+        Teacher teacher = teacherRepository.findByUserEmail(authentication.getName()).orElseThrow(UserNotFoundException::new);
+        return new TeacherDto(
+                teacher.getId(),
+                teacher.getUser().getName(),
+                teacher.getUser().getEmail(),
+                teacher.getExpertise()
+
+        );
+    }
+
+    public void updateMyProfile(UpdateMeByTeacherDto dto, Authentication authentication) {
+        Teacher teacher = teacherRepository.findByUserEmail(authentication.getName()).orElseThrow(UserNotFoundException::new);
+        User user = teacher.getUser();
+        user.setName(dto.getName());
+        teacher.setExpertise(dto.getExpertise());
+        teacher.setUser(user);
+        user.setTeacher(teacher);
+        userRepository.save(user);
     }
 }

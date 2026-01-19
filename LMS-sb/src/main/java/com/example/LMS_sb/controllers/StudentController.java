@@ -24,13 +24,13 @@ public class StudentController {
 
 
     @GetMapping("/api/students/me")
-    public ResponseEntity<?> getStudentProfile(Authentication authentication){
+    public ResponseEntity<?> getMyProfile(Authentication authentication){
         return ResponseEntity.ok(studentService.getMyProfile(authentication));
 
     }
 
     @PutMapping("/api/students/me")
-    public ResponseEntity<?> updateStudentProfile(@RequestBody UpdateMeByStudentDto dto, Authentication authentication){
+    public ResponseEntity<?> updateMyProfile(@RequestBody UpdateMeByStudentDto dto, Authentication authentication){
         studentService.updateMyProfile(dto,authentication);
         return ResponseEntity.ok("Your profile updated successfully");
 
