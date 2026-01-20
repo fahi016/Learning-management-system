@@ -52,6 +52,10 @@ public class CourseService {
         );
     }
 
+    public Course findCourseById(Long courseId){
+        return courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);
+    }
+
     public void updateCourseById(Long id, CourseDto dto) {
          Course course = courseRepository.findById(id).orElseThrow(CourseNotFoundException::new);
          Teacher teacher = teacherRepository.findById(dto.getTeacherId()).orElseThrow(UserNotFoundException::new);
@@ -106,4 +110,6 @@ public class CourseService {
                 ).toList();
 
     }
+
+
 }

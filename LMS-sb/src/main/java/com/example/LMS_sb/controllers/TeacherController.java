@@ -1,10 +1,13 @@
 package com.example.LMS_sb.controllers;
 
+import com.example.LMS_sb.dtos.AddLectureDto;
 import com.example.LMS_sb.dtos.UpdateMeByStudentDto;
 import com.example.LMS_sb.dtos.UpdateMeByTeacherDto;
 import com.example.LMS_sb.services.CourseService;
+import com.example.LMS_sb.services.LectureService;
 import com.example.LMS_sb.services.TeacherService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -17,6 +20,7 @@ public class TeacherController {
 
     private TeacherService teacherService;
     private CourseService courseService;
+    private LectureService lectureService;
 
     @GetMapping("/api/teachers/me")
     public ResponseEntity<?> getMyProfile(Authentication authentication){
@@ -35,5 +39,17 @@ public class TeacherController {
     public ResponseEntity<?> getMyCourses(Authentication authentication){
         return ResponseEntity.ok(courseService.getTeacherCourses(authentication));
     }
+
+    @PostMapping("/api/teachers/courses/{courseId}/lectures")
+    public ResponseEntity<?> addLecture(@PathVariable Long courseId, @RequestBody AddLectureDto dto, Authentication authentication){
+        lectureService.addLecture(courseId,authentication,dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Lecture created successfully");
+    }
+
+    @GetMapping("/api/courses/{courseId}/lectures")
+    public ResponseEntity<?> viewLectures(Authentication authentication){
+        return ResponseEntity.ok(lectureService.viewLectures(authentication));
+    }
+
 
 }
