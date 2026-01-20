@@ -45,14 +45,26 @@ public class TeacherController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Lecture created successfully");
     }
 
-    @GetMapping("/api/courses/{courseId}/lectures")
+    @GetMapping("/api/teachers/courses/{courseId}/lectures")
     public ResponseEntity<?> viewLectures(Authentication authentication,@PathVariable Long courseId){
         return ResponseEntity.ok(lectureService.viewLectures(authentication,courseId));
     }
 
-    @GetMapping("/api/courses/{courseId}/lectures/{lectureId}")
+    @GetMapping("/api/teachers/courses/{courseId}/lectures/{lectureId}")
     public ResponseEntity<?> viewLecture(Authentication authentication,@PathVariable Long courseId,@PathVariable Long lectureId){
         return ResponseEntity.ok(lectureService.viewLecture(authentication,courseId,lectureId));
+    }
+
+    @PutMapping("/api/teachers/courses/{courseId}/lectures/{lectureId}")
+    public ResponseEntity<?> editLecture(Authentication authentication,@PathVariable Long courseId,@PathVariable Long lectureId,@RequestBody AddUpdateLectureDto dto){
+        lectureService.editLecture(authentication,courseId,lectureId,dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Lecture updated successfully");
+    }
+
+    @DeleteMapping("/api/teachers/courses/{courseId}/lectures/{lectureId}")
+    public ResponseEntity<?> deleteLecture(Authentication authentication,@PathVariable Long courseId,@PathVariable Long lectureId,@RequestBody AddUpdateLectureDto dto){
+        lectureService.deleteLecture(authentication,courseId,lectureId,dto);
+        return ResponseEntity.ok("Lecture deleted successfully");
     }
 
 

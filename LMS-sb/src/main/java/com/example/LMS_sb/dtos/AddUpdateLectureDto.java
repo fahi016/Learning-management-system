@@ -1,11 +1,11 @@
-package com.example.LMS_sb.dtos;
+    package com.example.LMS_sb.dtos;
 
 
-import lombok.Data;
+    import lombok.Data;
 
-@Data
-public class AddUpdateLectureDto {
-    private String title;
-    private String videoUrl;
-    private String notesUrl;
-}
+    @Data
+    public class AddUpdateLectureDto {
+        private String title;
+        private String videoUrl;
+        private String notesUrl;
+    }

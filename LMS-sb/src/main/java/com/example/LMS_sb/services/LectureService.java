@@ -9,6 +9,7 @@ import com.example.LMS_sb.models.Course;
 import com.example.LMS_sb.models.Lecture;
 import com.example.LMS_sb.models.Teacher;
 import com.example.LMS_sb.repository.LectureRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class LectureService {
     private CourseService courseService;
     private LectureRepository lectureRepository;
 
+    @Transactional
     public void addLecture(Long courseId, Authentication authentication, AddUpdateLectureDto dto){
         Teacher teacher = teacherService.getTeacherByUserEmail(authentication.getName());
         Course course = courseService.findCourseById(courseId);
@@ -76,5 +78,36 @@ public class LectureService {
                         lecture.getVideoUrl(),
                         lecture.getNotesUrl()
                 );
+    }
+    @Transactional
+    public void editLecture(Authentication authentication, Long courseId, Long lectureId,AddUpdateLectureDto dto) {
+        Course course = courseService.findCourseById(courseId);
+        Teacher teacher = teacherService.getTeacherByUserEmail(authentication.getName());
+        if (!course.getTeacher().getId().equals(teacher.getId())) {
+            throw new CourseExcpetion("Teacher is not assigned to this course");
+        }
+
+        Lecture lecture = lectureRepository.findByIdAndCourse(lectureId,course).orElseThrow(LectureNotFoundException::new);
+        lecture.setTitle(dto.getTitle());
+        lecture.setVideoUrl(dto.getVideoUrl());
+        lecture.setNotesUrl(dto.getNotesUrl());
+        lectureRepository.save(lecture);
+
+    }
+
+    @Transactional
+    public void deleteLecture(Authentication authentication, Long courseId, Long lectureId, AddUpdateLectureDto dto) {
+        Course course = courseService.findCourseById(courseId);
+        Teacher teacher = teacherService.getTeacherByUserEmail(authentication.getName());
+
+        if (!course.getTeacher().getId().equals(teacher.getId())) {
+            throw new CourseExcpetion("Teacher is not assigned to this course");
+        }
+
+        Lecture lecture = lectureRepository
+                .findByIdAndCourse(lectureId, course)
+                .orElseThrow(LectureNotFoundException::new);
+
+        lectureRepository.delete(lecture);
     }
 }
