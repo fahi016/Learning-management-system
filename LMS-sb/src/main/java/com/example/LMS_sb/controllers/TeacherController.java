@@ -1,7 +1,6 @@
 package com.example.LMS_sb.controllers;
 
-import com.example.LMS_sb.dtos.AddLectureDto;
-import com.example.LMS_sb.dtos.UpdateMeByStudentDto;
+import com.example.LMS_sb.dtos.AddUpdateLectureDto;
 import com.example.LMS_sb.dtos.UpdateMeByTeacherDto;
 import com.example.LMS_sb.services.CourseService;
 import com.example.LMS_sb.services.LectureService;
@@ -41,14 +40,19 @@ public class TeacherController {
     }
 
     @PostMapping("/api/teachers/courses/{courseId}/lectures")
-    public ResponseEntity<?> addLecture(@PathVariable Long courseId, @RequestBody AddLectureDto dto, Authentication authentication){
+    public ResponseEntity<?> addLecture(@PathVariable Long courseId, @RequestBody AddUpdateLectureDto dto, Authentication authentication){
         lectureService.addLecture(courseId,authentication,dto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Lecture created successfully");
     }
 
     @GetMapping("/api/courses/{courseId}/lectures")
-    public ResponseEntity<?> viewLectures(Authentication authentication){
-        return ResponseEntity.ok(lectureService.viewLectures(authentication));
+    public ResponseEntity<?> viewLectures(Authentication authentication,@PathVariable Long courseId){
+        return ResponseEntity.ok(lectureService.viewLectures(authentication,courseId));
+    }
+
+    @GetMapping("/api/courses/{courseId}/lectures/{lectureId}")
+    public ResponseEntity<?> viewLecture(Authentication authentication,@PathVariable Long courseId,@PathVariable Long lectureId){
+        return ResponseEntity.ok(lectureService.viewLecture(authentication,courseId,lectureId));
     }
 
 
