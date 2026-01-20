@@ -9,10 +9,8 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetCourseDto {
+public class GetTeacherCourseDto {
     private Long id;
     private String title;
     private String description;
-    private String teacherName;
-    private LocalDateTime joinedAt;
 }

@@ -55,7 +55,7 @@ public class StudentController {
 
     @GetMapping("api/students/courses")
     public ResponseEntity<?> getAllMyCourses(Authentication authentication){
-        return ResponseEntity.ok(courseService.getAllMyCourses(authentication));
+        return ResponseEntity.ok(courseService.getStudentCourses(authentication));
     }
 
     @GetMapping("api/students/assignments")

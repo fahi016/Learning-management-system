@@ -2,7 +2,8 @@ package com.example.LMS_sb.services;
 
 
 import com.example.LMS_sb.dtos.CourseDto;
-import com.example.LMS_sb.dtos.GetCourseDto;
+import com.example.LMS_sb.dtos.GetStudentCourseDto;
+import com.example.LMS_sb.dtos.GetTeacherCourseDto;
 import com.example.LMS_sb.exceptions.CourseNotFoundException;
 import com.example.LMS_sb.exceptions.UserNotFoundException;
 import com.example.LMS_sb.models.Course;
@@ -26,10 +27,11 @@ public class CourseService {
     private final TeacherRepository teacherRepository;
     private final StudentRepository studentRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final TeacherService teacherService;
 
-    public List<GetCourseDto> getAllCourses(){
+    public List<GetStudentCourseDto> getAllCourses(){
         return courseRepository.findAll().stream().map(
-                course -> new GetCourseDto(
+                course -> new GetStudentCourseDto(
                         course.getId(),
                         course.getTitle(),
                         course.getDescription(),
@@ -39,9 +41,9 @@ public class CourseService {
         ).toList();
     }
 
-    public GetCourseDto getCourseById(Long courseId) {
+    public GetStudentCourseDto getCourseById(Long courseId) {
         Course course = courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);
-        return new GetCourseDto(
+        return new GetStudentCourseDto(
                 course.getId(),
                 course.getTitle(),
                 course.getDescription(),
@@ -74,12 +76,12 @@ public class CourseService {
         courseRepository.delete(course);
     }
 
-    public List<GetCourseDto> getAllMyCourses(Authentication authentication) {
+    public List<GetStudentCourseDto> getStudentCourses(Authentication authentication) {
         Student student = studentRepository.findByUserEmail(authentication.getName()).orElseThrow(UserNotFoundException::new);
         List<Enrollment> enrollments=  enrollmentRepository.findAllByStudentId(student.getId());
         return enrollments.stream().map(
                 enrollment ->
-                        new GetCourseDto(
+                        new GetStudentCourseDto(
                                 enrollment.getCourse().getId(),
                                 enrollment.getCourse().getTitle(),
                                 enrollment.getCourse().getDescription(),
@@ -88,5 +90,20 @@ public class CourseService {
 
                 )
         ).toList();
+    }
+
+    public List<GetTeacherCourseDto> getTeacherCourses(Authentication authentication) {
+        Teacher teacher = teacherService.getTeacherByUserEmail(authentication.getName());
+        List<Course> courses = courseRepository.findAllByTeacher(teacher);
+        return courses.stream()
+                .map(
+                        course -> new GetTeacherCourseDto(
+                                course.getId(),
+                                course.getTitle(),
+                                course.getDescription()
+
+                        )
+                ).toList();
+
     }
 }

@@ -2,15 +2,13 @@ package com.example.LMS_sb.controllers;
 
 import com.example.LMS_sb.dtos.UpdateMeByStudentDto;
 import com.example.LMS_sb.dtos.UpdateMeByTeacherDto;
+import com.example.LMS_sb.services.CourseService;
 import com.example.LMS_sb.services.TeacherService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TeacherController {
 
     private TeacherService teacherService;
+    private CourseService courseService;
 
     @GetMapping("/api/teachers/me")
     public ResponseEntity<?> getMyProfile(Authentication authentication){
@@ -30,6 +29,11 @@ public class TeacherController {
         teacherService.updateMyProfile(dto,authentication);
         return ResponseEntity.ok("Your profile updated successfully");
 
+    }
+
+    @GetMapping("/api/teachers/courses")
+    public ResponseEntity<?> getMyCourses(Authentication authentication){
+        return ResponseEntity.ok(courseService.getTeacherCourses(authentication));
     }
 
 }
