@@ -47,12 +47,12 @@ public class TeacherController {
 
     @GetMapping("/api/teachers/courses/{courseId}/lectures")
     public ResponseEntity<?> viewLectures(Authentication authentication,@PathVariable Long courseId){
-        return ResponseEntity.ok(lectureService.viewLectures(authentication,courseId));
+        return ResponseEntity.ok(lectureService.viewLecturesByTeacher(authentication,courseId));
     }
 
     @GetMapping("/api/teachers/courses/{courseId}/lectures/{lectureId}")
     public ResponseEntity<?> viewLecture(Authentication authentication,@PathVariable Long courseId,@PathVariable Long lectureId){
-        return ResponseEntity.ok(lectureService.viewLecture(authentication,courseId,lectureId));
+        return ResponseEntity.ok(lectureService.viewLectureByTeacher(authentication,courseId,lectureId));
     }
 
     @PutMapping("/api/teachers/courses/{courseId}/lectures/{lectureId}")

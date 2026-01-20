@@ -5,9 +5,7 @@ import com.example.LMS_sb.dtos.AddUpdateLectureDto;
 import com.example.LMS_sb.dtos.LectureDto;
 import com.example.LMS_sb.exceptions.CourseExcpetion;
 import com.example.LMS_sb.exceptions.LectureNotFoundException;
-import com.example.LMS_sb.models.Course;
-import com.example.LMS_sb.models.Lecture;
-import com.example.LMS_sb.models.Teacher;
+import com.example.LMS_sb.models.*;
 import com.example.LMS_sb.repository.LectureRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -23,6 +21,8 @@ public class LectureService {
     private TeacherService teacherService;
     private CourseService courseService;
     private LectureRepository lectureRepository;
+    private StudentService studentService;
+    private EnrollmentService enrollmentService;
 
     @Transactional
     public void addLecture(Long courseId, Authentication authentication, AddUpdateLectureDto dto){
@@ -42,7 +42,7 @@ public class LectureService {
 
     }
 
-    public List<LectureDto> viewLectures(Authentication authentication, Long courseId) {
+    public List<LectureDto> viewLecturesByTeacher(Authentication authentication, Long courseId) {
         Course course = courseService.findCourseById(courseId);
         Teacher teacher = teacherService.getTeacherByUserEmail(authentication.getName());
         if (!course.getTeacher().getId().equals(teacher.getId())) {
@@ -62,7 +62,7 @@ public class LectureService {
                 .toList();
     }
 
-    public LectureDto viewLecture(Authentication authentication, Long courseId, Long lectureId) {
+    public LectureDto viewLectureByTeacher(Authentication authentication, Long courseId, Long lectureId) {
 
         Course course = courseService.findCourseById(courseId);
         Teacher teacher = teacherService.getTeacherByUserEmail(authentication.getName());
@@ -109,5 +109,42 @@ public class LectureService {
                 .orElseThrow(LectureNotFoundException::new);
 
         lectureRepository.delete(lecture);
+    }
+
+    public List<LectureDto> viewLecturesByStudent(Authentication authentication, Long courseId) {
+        Course course = courseService.findCourseById(courseId);
+        Student student = studentService.getStudentByUserEmail(authentication.getName());
+        if (!enrollmentService.isStudentEnrolled(student.getId(),course.getId())) {
+            throw new CourseExcpetion("Student is not enrolled in this course");
+        }
+
+        return lectureRepository.findAllByCourse(course).stream()
+                .map(lecture -> new LectureDto(
+                        lecture.getId(),
+                        lecture.getTitle(),
+                        lecture.getVideoUrl(),
+                        lecture.getNotesUrl()
+                ))
+                .toList();
+    }
+
+
+    public LectureDto viewLectureByStudent(Authentication authentication, Long courseId,Long lectureId) {
+        Student student = studentService.getStudentByUserEmail(authentication.getName());
+        Course course = courseService.findCourseById(courseId);
+
+        List <Course> courses = enrollmentService.getCoursesByStudent(student);
+        if (!enrollmentService.isStudentEnrolled(student.getId(),course.getId())) {
+            throw new CourseExcpetion("Student is not enrolled in this course");
+        }
+        Lecture lecture = lectureRepository.findByIdAndCourse(lectureId,course).orElseThrow(LectureNotFoundException::new);
+
+        return new LectureDto(
+                        lecture.getId(),
+                        lecture.getTitle(),
+                        lecture.getVideoUrl(),
+                        lecture.getNotesUrl()
+        );
+
     }
 }

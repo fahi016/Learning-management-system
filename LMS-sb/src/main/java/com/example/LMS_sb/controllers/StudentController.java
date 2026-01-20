@@ -20,6 +20,7 @@ public class StudentController {
     private EnrollmentService enrollmentService;
     private AssignmentService assignmentService;
     private SubmissionService submissionService;
+    private LectureService lectureService;
 
 
 
@@ -75,5 +76,15 @@ public class StudentController {
     public ResponseEntity<?> submitAssignment(@PathVariable Long assignmentId,@RequestBody SubmissionCreateRequestDto dto, Authentication authentication){
         return ResponseEntity.ok(submissionService.submitAssignment(assignmentId,dto,authentication));
 
+    }
+
+    @GetMapping("/api/students/courses/{courseId}/lectures")
+    public ResponseEntity<?> viewLectures(Authentication authentication,@PathVariable Long courseId){
+        return ResponseEntity.ok(lectureService.viewLecturesByStudent(authentication,courseId));
+    }
+
+    @GetMapping("/api/students/courses/{courseId}/lectures/{lectureId}")
+    public ResponseEntity<?> viewLecture(Authentication authentication,@PathVariable Long courseId,@PathVariable Long lectureId){
+        return ResponseEntity.ok(lectureService.viewLectureByStudent(authentication,courseId,lectureId));
     }
 }
