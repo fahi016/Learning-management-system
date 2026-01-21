@@ -1,10 +1,7 @@
 package com.example.LMS_sb.services;
 
 
-import com.example.LMS_sb.dtos.GetAllSubmissionByTeacherDto;
-import com.example.LMS_sb.dtos.SubmissionCreateRequestDto;
-import com.example.LMS_sb.dtos.SubmissionDto;
-import com.example.LMS_sb.dtos.SubmissionResponseDto;
+import com.example.LMS_sb.dtos.*;
 import com.example.LMS_sb.exceptions.AssignmentNotFoundException;
 import com.example.LMS_sb.exceptions.DuplicateSubmissionException;
 import com.example.LMS_sb.exceptions.SubmissionNotFoundException;
@@ -71,6 +68,7 @@ public class SubmissionService {
         submission.setStudent(student);
         submission.setAssignment(assignment);
         submission.setFileUrl(dto.getFileUrl());
+        submission.setFeedback(dto.getFeedback());
         submission.setLateSubmission(isLate);
         submissionRepository.save(submission);
 
@@ -113,5 +111,30 @@ public class SubmissionService {
                 )
 
         ).toList();
+    }
+    @Transactional
+    public void gradeSubmission(Authentication authentication, Long submissionId, GradeDto dto) {
+        Teacher teacher = teacherService.getTeacherByUserEmail(authentication.getName());
+        Submission submission = submissionRepository.findById(submissionId).orElseThrow(SubmissionNotFoundException::new);
+        if(!submission.getAssignment().getCourse().getTeacher().getId().equals(teacher.getId())){
+            throw new AccessDeniedException(
+                    "Teacher does not own this assignment"
+            );
+        }
+
+        if (submission.getGrade() != null) {
+            throw new IllegalStateException(
+                    "Submission has already been graded"
+            );
+        }
+
+        if (dto.getGrade() < 0 || dto.getGrade() > 100) {
+            throw new IllegalArgumentException(
+                    "Grade must be between 0 and 100"
+            );
+        }
+        submission.setGrade(dto.getGrade());
+        submissionRepository.save(submission);
+
     }
 }

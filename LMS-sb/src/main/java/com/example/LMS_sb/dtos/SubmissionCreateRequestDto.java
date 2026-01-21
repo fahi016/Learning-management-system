@@ -12,4 +12,5 @@ public class SubmissionCreateRequestDto {
 
     @NotBlank
     private String fileUrl;
+    private String feedback;
 }

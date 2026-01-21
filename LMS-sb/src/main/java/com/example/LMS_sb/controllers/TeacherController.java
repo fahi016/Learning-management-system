@@ -2,6 +2,7 @@ package com.example.LMS_sb.controllers;
 
 import com.example.LMS_sb.dtos.AddUpdateLectureDto;
 import com.example.LMS_sb.dtos.CreateUpdateAssignmentDto;
+import com.example.LMS_sb.dtos.GradeDto;
 import com.example.LMS_sb.dtos.UpdateMeByTeacherDto;
 import com.example.LMS_sb.services.*;
 import lombok.AllArgsConstructor;
@@ -102,6 +103,14 @@ public class TeacherController {
     @GetMapping("/api/assignments/{assignmentId}/submissions")
     public ResponseEntity<?> viewSubmissions(Authentication authentication, @PathVariable Long assignmentId){
         return ResponseEntity.ok(submissionService.viewSubmissionsForTeacher(authentication,assignmentId));
+    }
+
+    @PutMapping("/api/submissions/{submissionId}/grade")
+    public ResponseEntity<?> gradeSubmission(Authentication authentication, @PathVariable Long submissionId,@RequestBody GradeDto dto){
+        submissionService.gradeSubmission(authentication,submissionId,dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                "Submission graded successfully"
+        );
     }
 
 }
