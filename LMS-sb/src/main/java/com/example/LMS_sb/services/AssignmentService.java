@@ -137,4 +137,16 @@ public class AssignmentService {
         assignment.setDueDate(dto.getDueDate());
         assignmentRepository.save(assignment);
     }
+
+    public void deleteAssignment(Authentication authentication, Long assignmentId) {
+
+        Teacher teacher = teacherService.getTeacherByUserEmail(authentication.getName());
+        Assignment assignment =  assignmentRepository.findById(assignmentId).orElseThrow(AssignmentNotFoundException::new);
+        Course course = assignment.getCourse();
+        if (!course.getTeacher().getId().equals(teacher.getId())) {
+            throw new AccessDeniedException("Teacher does not own this assignment");
+        }
+        assignmentRepository.delete(assignment);
+
+    }
 }

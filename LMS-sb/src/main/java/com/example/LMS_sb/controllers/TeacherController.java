@@ -95,5 +95,11 @@ public class TeacherController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Assignment updated successfully");
     }
 
+    @DeleteMapping("/api/assignments/{assignmentId}")
+    public ResponseEntity<?> deleteAssignment(Authentication authentication,@PathVariable Long assignmentId){
+        assignmentService.deleteAssignment(authentication,assignmentId);
+        return ResponseEntity.ok("Assignment deleted successfully");
+    }
+
 
 }
