@@ -1,6 +1,7 @@
 package com.example.LMS_sb.services;
 
 
+import com.example.LMS_sb.dtos.GetAllSubmissionByTeacherDto;
 import com.example.LMS_sb.dtos.SubmissionCreateRequestDto;
 import com.example.LMS_sb.dtos.SubmissionDto;
 import com.example.LMS_sb.dtos.SubmissionResponseDto;
@@ -83,7 +84,7 @@ public class SubmissionService {
     }
 
     @Transactional()
-    public List<SubmissionDto> viewSubmissionsForTeacher(Authentication authentication, Long assignmentId) {
+    public List<GetAllSubmissionByTeacherDto> viewSubmissionsForTeacher(Authentication authentication, Long assignmentId) {
         Teacher teacher = teacherService.getTeacherByUserEmail(authentication.getName());
         Assignment assignment = assignmentService.getAssignmentById(assignmentId);
         List<Submission> submissions = submissionRepository.findAllByAssignment(assignment);
@@ -92,9 +93,10 @@ public class SubmissionService {
                     "Teacher does not own this assignment"
             );        }
         return submissions.stream().map(
-                submission -> new SubmissionDto(
+                submission -> new GetAllSubmissionByTeacherDto(
                         submission.getId(),
-                        submission.getAssignment().getId(),
+                        submission.getStudent().getId(),
+                        submission.getStudent().getUser().getName(),
                         submission.getAssignment().getTitle(),
                         submission.getAssignment().getCourse().getId(),
                         submission.getAssignment().getCourse().getTitle(),
@@ -103,6 +105,8 @@ public class SubmissionService {
                         submission.getGrade(),
                         submission.getFeedback(),
                         submission.getGrade()!=null
+
+
 
 
 
