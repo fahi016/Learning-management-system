@@ -1,7 +1,9 @@
 package com.example.LMS_sb.controllers;
 
 import com.example.LMS_sb.dtos.AddUpdateLectureDto;
+import com.example.LMS_sb.dtos.CreateAssignmentDto;
 import com.example.LMS_sb.dtos.UpdateMeByTeacherDto;
+import com.example.LMS_sb.services.AssignmentService;
 import com.example.LMS_sb.services.CourseService;
 import com.example.LMS_sb.services.LectureService;
 import com.example.LMS_sb.services.TeacherService;
@@ -20,6 +22,7 @@ public class TeacherController {
     private TeacherService teacherService;
     private CourseService courseService;
     private LectureService lectureService;
+    private AssignmentService assignmentService;
 
     @GetMapping("/api/teachers/me")
     public ResponseEntity<?> getMyProfile(Authentication authentication){
@@ -65,6 +68,25 @@ public class TeacherController {
     public ResponseEntity<?> deleteLecture(Authentication authentication,@PathVariable Long courseId,@PathVariable Long lectureId,@RequestBody AddUpdateLectureDto dto){
         lectureService.deleteLecture(authentication,courseId,lectureId,dto);
         return ResponseEntity.ok("Lecture deleted successfully");
+    }
+
+    @PostMapping("/api/teachers/courses/{courseId}/assignments")
+    public ResponseEntity<?> createAssignment(Authentication authentication, @PathVariable Long courseId, @RequestBody CreateAssignmentDto dto){
+        assignmentService.createAssignment(authentication,courseId,dto);
+        return ResponseEntity.ok("Assignment successfully");
+
+    }
+
+    @GetMapping("/api/teachers/assignments")
+    public ResponseEntity<?> getTeacherAssignments(Authentication authentication){
+        return ResponseEntity.ok(assignmentService.getTeacherAssignments(authentication));
+
+    }
+
+    @GetMapping("/api/teachers/assignments/{assignmentId}")
+    public ResponseEntity<?> getTeacherAssignmentById(@PathVariable Long assignmentId,Authentication authentication){
+        return ResponseEntity.ok(assignmentService.getTeacherAssignmentById(assignmentId,authentication));
+
     }
 
 

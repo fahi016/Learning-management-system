@@ -112,4 +112,7 @@ public class CourseService {
     }
 
 
+    public List<Course> getCoursesByTeacher(Teacher teacher) {
+        return courseRepository.findAllByTeacher(teacher);
+    }
 }

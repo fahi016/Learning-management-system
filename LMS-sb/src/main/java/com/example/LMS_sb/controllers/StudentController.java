@@ -61,11 +61,11 @@ public class StudentController {
 
     @GetMapping("api/students/assignments")
     public ResponseEntity<?> getMyAssignments(Authentication authentication){
-        return ResponseEntity.ok(assignmentService.getMyAssignments(authentication));
+        return ResponseEntity.ok(assignmentService.getStudentAssignments(authentication));
     }
     @GetMapping("api/students/assignments/{id}")
-    public ResponseEntity<?> getMyAssignmentById(@PathVariable Long id){
-        return ResponseEntity.ok(assignmentService.getMyAssignmentById(id));
+    public ResponseEntity<?> getMyAssignmentById(@PathVariable Long id,Authentication authentication){
+        return ResponseEntity.ok(assignmentService.getStudentAssignmentById(id,authentication));
     }
 
     @GetMapping("api/students/submissions")
