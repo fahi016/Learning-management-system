@@ -4,13 +4,13 @@ package com.example.LMS_sb.services;
 import com.example.LMS_sb.dtos.SubmissionCreateRequestDto;
 import com.example.LMS_sb.dtos.SubmissionDto;
 import com.example.LMS_sb.dtos.SubmissionResponseDto;
+import com.example.LMS_sb.exceptions.AssignmentNotFoundException;
 import com.example.LMS_sb.exceptions.DuplicateSubmissionException;
 import com.example.LMS_sb.exceptions.SubmissionNotFoundException;
-import com.example.LMS_sb.models.Assignment;
-import com.example.LMS_sb.models.Student;
-import com.example.LMS_sb.models.Submission;
+import com.example.LMS_sb.models.*;
 import com.example.LMS_sb.repository.StudentRepository;
 import com.example.LMS_sb.repository.SubmissionRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -22,10 +22,11 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class SubmissionService {
-    StudentService studentService;
-    SubmissionRepository submissionRepository;
-    AssignmentService assignmentService;
-    EnrollmentService enrollmentService;
+    private StudentService studentService;
+    private SubmissionRepository submissionRepository;
+    private AssignmentService assignmentService;
+    private EnrollmentService enrollmentService;
+    private TeacherService teacherService;
 
     public List<SubmissionDto> getMySubmissions(Authentication authentication){
          Long studentId = studentService.getStudentByUserEmail(authentication.getName()).getId();
@@ -79,5 +80,34 @@ public class SubmissionService {
                 false,
                 isLate
         );
+    }
+
+    @Transactional()
+    public List<SubmissionDto> viewSubmissionsForTeacher(Authentication authentication, Long assignmentId) {
+        Teacher teacher = teacherService.getTeacherByUserEmail(authentication.getName());
+        Assignment assignment = assignmentService.getAssignmentById(assignmentId);
+        List<Submission> submissions = submissionRepository.findAllByAssignment(assignment);
+        if(!assignment.getCourse().getTeacher().getId().equals(teacher.getId())){
+            throw new AccessDeniedException(
+                    "Teacher does not own this assignment"
+            );        }
+        return submissions.stream().map(
+                submission -> new SubmissionDto(
+                        submission.getId(),
+                        submission.getAssignment().getId(),
+                        submission.getAssignment().getTitle(),
+                        submission.getAssignment().getCourse().getId(),
+                        submission.getAssignment().getCourse().getTitle(),
+                        submission.getFileUrl(),
+                        submission.getSubmittedAt(),
+                        submission.getGrade(),
+                        submission.getFeedback(),
+                        submission.getGrade()!=null
+
+
+
+                )
+
+        ).toList();
     }
 }

@@ -3,10 +3,7 @@ package com.example.LMS_sb.controllers;
 import com.example.LMS_sb.dtos.AddUpdateLectureDto;
 import com.example.LMS_sb.dtos.CreateUpdateAssignmentDto;
 import com.example.LMS_sb.dtos.UpdateMeByTeacherDto;
-import com.example.LMS_sb.services.AssignmentService;
-import com.example.LMS_sb.services.CourseService;
-import com.example.LMS_sb.services.LectureService;
-import com.example.LMS_sb.services.TeacherService;
+import com.example.LMS_sb.services.*;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +20,7 @@ public class TeacherController {
     private CourseService courseService;
     private LectureService lectureService;
     private AssignmentService assignmentService;
+    private SubmissionService submissionService;
 
     @GetMapping("/api/teachers/me")
     public ResponseEntity<?> getMyProfile(Authentication authentication){
@@ -101,5 +99,9 @@ public class TeacherController {
         return ResponseEntity.ok("Assignment deleted successfully");
     }
 
+    @GetMapping("/api/assignments/{assignmentId}/submissions")
+    public ResponseEntity<?> viewSubmissions(Authentication authentication, @PathVariable Long assignmentId){
+        return ResponseEntity.ok(submissionService.viewSubmissionsForTeacher(authentication,assignmentId));
+    }
 
 }

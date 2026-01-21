@@ -1,5 +1,6 @@
 package com.example.LMS_sb.repository;
 
+import com.example.LMS_sb.models.Assignment;
 import com.example.LMS_sb.models.Submission;
 import com.example.LMS_sb.services.SubmissionService;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,5 +13,7 @@ import java.util.Optional;
 public interface SubmissionRepository extends JpaRepository<Submission,Long> {
     List<Submission> findAllByStudentId(Long studentId);
     boolean existsByAssignmentIdAndStudentId(Long assignmentId, Long studentId);
+
+    List<Submission> findAllByAssignment(Assignment assignment);
 
 }
