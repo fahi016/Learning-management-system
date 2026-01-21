@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateAssignmentDto {
+public class CreateUpdateAssignmentDto {
     private String title;
     private String description;
     private LocalDateTime dueDate;

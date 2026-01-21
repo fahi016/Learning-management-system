@@ -2,7 +2,7 @@ package com.example.LMS_sb.services;
 
 
 import com.example.LMS_sb.dtos.AssignmentDto;
-import com.example.LMS_sb.dtos.CreateAssignmentDto;
+import com.example.LMS_sb.dtos.CreateUpdateAssignmentDto;
 import com.example.LMS_sb.exceptions.AssignmentNotFoundException;
 import com.example.LMS_sb.exceptions.CourseExcpetion;
 import com.example.LMS_sb.models.Assignment;
@@ -70,7 +70,7 @@ public class AssignmentService {
         return assignmentRepository.findById(assignmentId).orElseThrow(AssignmentNotFoundException::new);
     }
     @Transactional
-    public void createAssignment(Authentication authentication, Long courseId, CreateAssignmentDto dto) {
+    public void createAssignment(Authentication authentication, Long courseId, CreateUpdateAssignmentDto dto) {
          Course course = courseService.findCourseById(courseId);
         Teacher teacher = teacherService.getTeacherByUserEmail(authentication.getName());
 
@@ -121,5 +121,20 @@ public class AssignmentService {
                 assignment.getDueDate()
         );
 
+    }
+    @Transactional
+    public void editAssignment(Authentication authentication, Long assignmentId, CreateUpdateAssignmentDto dto) {
+        Teacher teacher = teacherService.getTeacherByUserEmail(authentication.getName());
+        Assignment assignment =  assignmentRepository.findById(assignmentId).orElseThrow(AssignmentNotFoundException::new);
+        Course course = assignment.getCourse();
+        if (!course.getTeacher().getId().equals(teacher.getId())) {
+            throw new AccessDeniedException("Teacher does not own this assignment");
+        }
+
+        assignment.setTitle(dto.getTitle());
+        assignment.setDescription(dto.getDescription());
+        assignment.setCourse(course);
+        assignment.setDueDate(dto.getDueDate());
+        assignmentRepository.save(assignment);
     }
 }

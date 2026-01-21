@@ -1,7 +1,7 @@
 package com.example.LMS_sb.controllers;
 
 import com.example.LMS_sb.dtos.AddUpdateLectureDto;
-import com.example.LMS_sb.dtos.CreateAssignmentDto;
+import com.example.LMS_sb.dtos.CreateUpdateAssignmentDto;
 import com.example.LMS_sb.dtos.UpdateMeByTeacherDto;
 import com.example.LMS_sb.services.AssignmentService;
 import com.example.LMS_sb.services.CourseService;
@@ -71,9 +71,9 @@ public class TeacherController {
     }
 
     @PostMapping("/api/teachers/courses/{courseId}/assignments")
-    public ResponseEntity<?> createAssignment(Authentication authentication, @PathVariable Long courseId, @RequestBody CreateAssignmentDto dto){
+    public ResponseEntity<?> createAssignment(Authentication authentication, @PathVariable Long courseId, @RequestBody CreateUpdateAssignmentDto dto){
         assignmentService.createAssignment(authentication,courseId,dto);
-        return ResponseEntity.ok("Assignment successfully");
+        return ResponseEntity.ok("Assignment created successfully");
 
     }
 
@@ -87,6 +87,12 @@ public class TeacherController {
     public ResponseEntity<?> getTeacherAssignmentById(@PathVariable Long assignmentId,Authentication authentication){
         return ResponseEntity.ok(assignmentService.getTeacherAssignmentById(assignmentId,authentication));
 
+    }
+
+    @PutMapping("/api/assignments/{assignmentId}")
+    public ResponseEntity<?> editAssignment(Authentication authentication,@PathVariable Long assignmentId,@RequestBody CreateUpdateAssignmentDto dto){
+        assignmentService.editAssignment(authentication,assignmentId,dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Assignment updated successfully");
     }
 
 
