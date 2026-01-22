@@ -67,24 +67,26 @@ public class WebSecurityConfig {
                          )
                         )
                 .authorizeHttpRequests(auth -> auth
+                        // AUTH
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/reset-password").hasAuthority("PASSWORD_RESET")
-
                         .requestMatchers("/api/auth/me").authenticated()
                         .requestMatchers("/api/auth/register/**").hasRole("ADMIN")
                         .requestMatchers("/api/auth/unlock-user").hasRole("ADMIN")
-                        //STUDENT
-                        .requestMatchers("/api/students/**").hasRole("STUDENT")
 
-                        //TEACHER
-                        .requestMatchers("/api/teachers/**").hasRole("TEACHER")
-                        .requestMatchers("/api/lectures/**").hasRole("TEACHER")
-                        .requestMatchers("/api/assignments/**").hasRole("TEACHER")
-
-                        //ADMIN
+                        // ADMIN
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        //EVERYTHING ELSE
+                        // STUDENT
+                        .requestMatchers("/api/students/**").hasRole("STUDENT")
+                        .requestMatchers("/api/courses/**").authenticated()
+
+                        // TEACHER
+                        .requestMatchers("/api/teachers/**").hasRole("TEACHER")
+                        .requestMatchers("/api/assignments/**").hasRole("TEACHER")
+                        .requestMatchers("/api/submissions/**").hasRole("TEACHER")
+
+                        // EVERYTHING ELSE
                         .anyRequest().authenticated()
                 );
         http.authenticationProvider(authenticationProvider());
